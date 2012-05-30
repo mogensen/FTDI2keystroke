@@ -1,0 +1,34 @@
+#!/bin/bash
+set -o nounset
+
+if [ ${1:0:7} != "/dev/cu" ]; then 
+	echo "Error: Expected a device if on the form /dev/cu.xxxxxxx"
+	exit 1
+fi
+
+platform='unknown'
+unamestr=`uname`
+if [[ "$unamestr" == 'Linux' ]]; then
+	platform='linux'
+elif [[ "$unamestr" == 'Darwin' ]]; then
+	platform='osx'
+fi
+
+echo "=========================" 
+echo "== Running on: $platform" 
+echo "== Using dev : $1" 
+echo "=========================" 
+
+cat $1 |
+while read rfid 
+do
+	echo "found $rfid"
+	ID=$((0x${rfid:6:6}))
+	echo "found $ID"
+	if [[ $platform == 'linux' ]]; then
+		xdotool key $ID
+		xdotool key "Return" 
+	elif [[ $platform == 'osx' ]]; then
+		osascript -e 'tell application "System Events" to keystroke "'$ID'" & return'
+	fi
+done
