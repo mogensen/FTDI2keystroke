@@ -23,7 +23,11 @@ cat $1 |
 while read rfid 
 do
 	echo "found $rfid"
+
+	# Remove the first 6 characters and the chech sum at the end
+	# Convert to decimal from hex
 	ID=$((0x${rfid:6:6}))
+	# Debug output
 	echo "found $ID"
 	if [[ $platform == 'linux' ]]; then
 		xdotool key $ID
